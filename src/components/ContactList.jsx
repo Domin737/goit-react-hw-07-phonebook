@@ -1,17 +1,32 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { removeContact } from '../redux/contactsSlice';
+import { fetchContacts, removeContact } from '../redux/contactsSlice';
 import ContactItem from './ContactItem';
 import { List } from './ContactList.styled';
 
 const ContactList = () => {
-  const contacts = useSelector(state => state.contacts.contacts) || [];
-  const filter = useSelector(state => state.contacts.filter) || '';
+  const { contacts, filter, status, error } = useSelector(
+    state => state.contacts
+  );
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (status === 'idle') {
+      dispatch(fetchContacts());
+    }
+  }, [status, dispatch]);
 
   const filteredContacts = contacts.filter(contact =>
     contact.name.toLowerCase().includes(filter.toLowerCase())
   );
+
+  if (status === 'loading') {
+    return <div>Loading...</div>;
+  }
+
+  if (status === 'failed') {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <List>
