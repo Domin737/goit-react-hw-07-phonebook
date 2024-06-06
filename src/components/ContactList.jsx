@@ -14,10 +14,6 @@ const ContactList = () => {
     dispatch(fetchContacts());
   }, [dispatch]);
 
-  const filteredContacts = contacts.filter(contact =>
-    contact.name.toLowerCase().includes(filter.toLowerCase())
-  );
-
   if (status === 'loading') {
     return <div>Loading...</div>;
   }
@@ -25,6 +21,15 @@ const ContactList = () => {
   if (status === 'failed') {
     return <div>Error: {error}</div>;
   }
+
+  // Dodane sprawdzenie
+  if (!contacts) {
+    return <div>No contacts available</div>;
+  }
+
+  const filteredContacts = contacts.filter(contact =>
+    contact.name.toLowerCase().includes(filter.toLowerCase())
+  );
 
   return (
     <List>
