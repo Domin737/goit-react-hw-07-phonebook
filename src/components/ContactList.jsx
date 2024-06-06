@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchContacts, removeContact } from '../redux/contactsSlice';
+import { fetchContacts, deleteContact } from '../redux/contactsSlice';
 import ContactItem from './ContactItem';
 import { List } from './ContactList.styled';
 
@@ -11,10 +11,8 @@ const ContactList = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (status === 'idle') {
-      dispatch(fetchContacts());
-    }
-  }, [status, dispatch]);
+    dispatch(fetchContacts());
+  }, [dispatch]);
 
   const filteredContacts = contacts.filter(contact =>
     contact.name.toLowerCase().includes(filter.toLowerCase())
@@ -34,7 +32,7 @@ const ContactList = () => {
         <ContactItem
           key={contact.id}
           contact={contact}
-          onDelete={() => dispatch(removeContact(contact.id))}
+          onDelete={() => dispatch(deleteContact(contact.id))}
         />
       ))}
     </List>

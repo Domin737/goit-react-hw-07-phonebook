@@ -1,32 +1,41 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-const API_ENDPOINT = 'https://6661051b63e6a0189fe83746.mockapi.io/contacts';
+axios.defaults.baseURL = 'https://6661051b63e6a0189fe83746.mockapi.io';
 
 export const fetchContacts = createAsyncThunk(
   'contacts/fetchContacts',
-  async () => {
-    const response = await axios.get(API_ENDPOINT);
-    console.log('fetchContacts response:', response.data);
-    return response.data;
+  async (_, thunkAPI) => {
+    try {
+      const response = await axios.get('/contacts');
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
   }
 );
 
 export const addContact = createAsyncThunk(
   'contacts/addContact',
-  async contact => {
-    const response = await axios.post(API_ENDPOINT, contact);
-    console.log('addContact response:', response.data);
-    return response.data;
+  async (contact, thunkAPI) => {
+    try {
+      const response = await axios.post('/contacts', contact);
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
   }
 );
 
-export const removeContact = createAsyncThunk(
-  'contacts/removeContact',
-  async id => {
-    await axios.delete(`${API_ENDPOINT}/${id}`);
-    console.log('removeContact response:', id);
-    return id;
+export const deleteContact = createAsyncThunk(
+  'contacts/deleteContact',
+  async (contactId, thunkAPI) => {
+    try {
+      const response = await axios.delete(`/contacts/${contactId}`);
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
   }
 );
 
@@ -54,14 +63,14 @@ const contactsSlice = createSlice({
       })
       .addCase(fetchContacts.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.error.message;
+        state.error = action.payload;
       })
       .addCase(addContact.fulfilled, (state, action) => {
         state.contacts.push(action.payload);
       })
-      .addCase(removeContact.fulfilled, (state, action) => {
+      .addCase(deleteContact.fulfilled, (state, action) => {
         state.contacts = state.contacts.filter(
-          contact => contact.id !== action.payload
+          contact => contact.id !== action.payload.id
         );
       });
   },
